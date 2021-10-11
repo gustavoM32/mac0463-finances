@@ -1,15 +1,15 @@
 import * as React from 'react';
 import { StyleSheet } from 'react-native';
 
-import EditScreenInfo from '../components/EditScreenInfo';
 import { Text, View } from '../components/Themed';
+import { RootTabScreenProps } from '../types';
 
-export default function TabTwoScreen() {
+export default function WeatherScreen({ navigation }: RootTabScreenProps<'Weather'>) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab Two</Text>
+      <Text style={styles.title}>Weather</Text>
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="/screens/TabTwoScreen.tsx" />
+      <Text style={styles.title}>This is the weather screen</Text>
     </View>
   );
 }

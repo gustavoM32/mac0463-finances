@@ -14,8 +14,10 @@ import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
 import ModalScreen from '../screens/ModalScreen';
 import NotFoundScreen from '../screens/NotFoundScreen';
-import TabOneScreen from '../screens/TabOneScreen';
-import TabTwoScreen from '../screens/TabTwoScreen';
+import HomeScreen from '../screens/HomeScreen';
+import ProfileScreen from '../screens/ProfileScreen';
+import StatisticsScreen from '../screens/StatisticsScreen';
+import WeatherScreen from '../screens/WeatherScreen';
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
 
@@ -57,40 +59,59 @@ function BottomTabNavigator() {
   const colorScheme = useColorScheme();
 
   return (
-    <BottomTab.Navigator
-      initialRouteName="TabOne"
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme].tint,
-      }}>
+    <BottomTab.Navigator 
+      initialRouteName="Home"
+      // I'll decide about layout that later
+      // screenOptions={{
+      //   tabBarActiveTintColor: Colors[colorScheme].tint,
+      // }}
+    >
       <BottomTab.Screen
-        name="TabOne"
-        component={TabOneScreen}
-        options={({ navigation }: RootTabScreenProps<'TabOne'>) => ({
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          headerRight: () => (
-            <Pressable
-              onPress={() => navigation.navigate('Modal')}
-              style={({ pressed }) => ({
-                opacity: pressed ? 0.5 : 1,
-              })}>
-              <FontAwesome
-                name="info-circle"
-                size={25}
-                color={Colors[colorScheme].text}
-                style={{ marginRight: 15 }}
-              />
-            </Pressable>
-          ),
+        name="Home"
+        component={HomeScreen}
+        options={({ navigation }: RootTabScreenProps<'Home'>) => ({
+          title: 'Home',
+          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />
+          // this should be removed, I just kept it here for later reference
+          // headerRight: () => (
+          //   <Pressable
+          //     onPress={() => navigation.navigate('Modal')}
+          //     style={({ pressed }) => ({
+          //       opacity: pressed ? 0.5 : 1,
+          //     })}>
+          //     <FontAwesome
+          //       name="info-circle"
+          //       size={25}
+          //       color={Colors[colorScheme].text}
+          //       style={{ marginRight: 15 }}
+          //     />
+          //   </Pressable>
+          // ),
         })}
       />
       <BottomTab.Screen
-        name="TabTwo"
-        component={TabTwoScreen}
-        options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-        }}
+        name="Statistics"
+        component={StatisticsScreen}
+        options={({ navigation }: RootTabScreenProps<'Statistics'>) => ({
+          title: 'Statistics',
+          tabBarIcon: ({ color }) => <TabBarIcon name="chart-bar" color={color} />
+        })}
+      />
+      <BottomTab.Screen
+        name="Weather"
+        component={WeatherScreen}
+        options={({ navigation }: RootTabScreenProps<'Weather'>) => ({
+          title: 'Weather',
+          tabBarIcon: ({ color }) => <TabBarIcon name="weather-partly-cloudy" color={color} />
+        })}
+      />
+      <BottomTab.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={({ navigation }: RootTabScreenProps<'Profile'>) => ({
+          title: 'Profile',
+          tabBarIcon: ({ color }) => <TabBarIcon name="account" color={color} />
+        })}
       />
     </BottomTab.Navigator>
   );
