@@ -14,12 +14,16 @@ import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
 import ModalScreen from '../screens/ModalScreen';
 import NotFoundScreen from '../screens/NotFoundScreen';
+import LoginScreen from '../screens/auth/LoginScreen';
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import StatisticsScreen from '../screens/StatisticsScreen';
 import WeatherScreen from '../screens/WeatherScreen';
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
+
+import * as SecureStore from 'expo-secure-store';
+import { AuthContext } from '../constants/Contexts';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
   return (
@@ -38,14 +42,52 @@ export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeNa
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function RootNavigator() {
+  const [userToken, setUserToken] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    const bootstrapAsync = async () => {
+      let token : string | null;
+
+      try {
+        token = await SecureStore.getItemAsync('userToken');
+      } catch (e) {
+        console.log("Token not found");
+        token = null;
+      }
+
+      setUserToken(token);
+    };
+
+    bootstrapAsync();
+  }, []);
+
+  const authContext = {
+    signIn: async (token: string) => {
+      try {
+        await SecureStore.setItemAsync('userToken', token);
+      } catch (e) {
+        console.log("Couldn't store token")
+      }
+      setUserToken(token);
+    }
+  }
+
   return (
-    <Stack.Navigator>
-      <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: false }} />
-      <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
-      <Stack.Group screenOptions={{ presentation: 'modal' }}>
-        <Stack.Screen name="Modal" component={ModalScreen} />
-      </Stack.Group>
-    </Stack.Navigator>
+    <AuthContext.Provider value={authContext}>
+      <Stack.Navigator>
+        {userToken == null ? (
+          <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+        ) : (
+          <>
+            <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: false }} />
+            <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
+            <Stack.Group screenOptions={{ presentation: 'modal' }}>
+              <Stack.Screen name="Modal" component={ModalScreen} />
+            </Stack.Group>
+          </>
+      )}
+      </Stack.Navigator>
+    </AuthContext.Provider>
   );
 }
 
@@ -59,7 +101,7 @@ function BottomTabNavigator() {
   const colorScheme = useColorScheme();
 
   return (
-    <BottomTab.Navigator 
+    <BottomTab.Navigator
       initialRouteName="Home"
       // I'll decide about layout that later
       // screenOptions={{
