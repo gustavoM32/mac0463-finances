@@ -5,7 +5,7 @@ import * as Location from 'expo-location';
 import { Text, View } from '../components/Themed';
 import { RootTabScreenProps } from '../types';
 import { WEATHER_API_KEY } from 'react-native-dotenv';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getData, setData } from '../store/Store';
 
 const BASE_WEATHER_URL = "https://api.openweathermap.org/data/2.5/forecast?";
 
@@ -73,30 +73,10 @@ export default function WeatherScreen({ navigation }: RootTabScreenProps<'Weathe
     );
   }
 
-  const storeData = async (value: any) => {
-    try {
-      if (value == null) return;
-      const jsonValue = JSON.stringify(value)
-      await AsyncStorage.setItem('weatherData', jsonValue)
-    } catch (e) {
-      console.log("Error saving weather data");
-    }
-  }
-
-  const getData = async () => {
-    try {
-      const jsonValue = await AsyncStorage.getItem('weatherData');
-      return jsonValue != null ? JSON.parse(jsonValue) : {};
-    } catch(e) {
-      console.log("Error reading weather data");
-      return {};
-    }
-  }
-
   const genForecastViews = async () => {
     const cityId = weatherInfo.city.id;
     const forecast = weatherInfo.list;
-    let storedData : any = await getData();
+    let storedData : any = await getData('weatherData', {});
 
     if (!(cityId in storedData)) {
       storedData[cityId] = {};
@@ -115,7 +95,7 @@ export default function WeatherScreen({ navigation }: RootTabScreenProps<'Weathe
       storedData[cityId][time] = dataToStore;
     }
   
-    storeData(storedData);
+    setData('weatherData', storedData);
 
     const cityData = storedData[cityId];
 
