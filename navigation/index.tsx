@@ -23,7 +23,7 @@ import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../typ
 import LinkingConfiguration from './LinkingConfiguration';
 
 import * as SecureStore from 'expo-secure-store';
-import { AuthContext } from '../constants/Contexts';
+import { AuthContext, UserInfoContext } from '../constants/Contexts';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
   return (
@@ -43,6 +43,20 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function RootNavigator() {
   const [userToken, setUserToken] = React.useState<string | null>(null);
+  const [userInfo, setUserInfo] = React.useState<any>(null);
+
+  const fetchUserInfo = async (token: string) => {
+    const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+    });
+  
+    return await response.json();
+  }
 
   React.useEffect(() => {
     const bootstrapAsync = async () => {
@@ -55,6 +69,11 @@ function RootNavigator() {
         token = null;
       }
 
+      
+      if (token != null) {
+        const user = await fetchUserInfo(token);
+        setUserInfo(user);
+      }
       setUserToken(token);
     };
 
@@ -68,25 +87,35 @@ function RootNavigator() {
       } catch (e) {
         console.log("Couldn't store token")
       }
+
+      const user = await fetchUserInfo(token);
+      
+      setUserInfo(user);
       setUserToken(token);
     }
+  }
+  
+  const userInfoContext = {
+    userInfo: userInfo
   }
 
   return (
     <AuthContext.Provider value={authContext}>
-      <Stack.Navigator>
-        {userToken == null ? (
-          <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
-        ) : (
-          <>
-            <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: false }} />
-            <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
-            <Stack.Group screenOptions={{ presentation: 'modal' }}>
-              <Stack.Screen name="Modal" component={ModalScreen} />
-            </Stack.Group>
-          </>
-      )}
-      </Stack.Navigator>
+      <UserInfoContext.Provider value={userInfoContext}>
+        <Stack.Navigator>
+          {userToken == null ? (
+            <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+          ) : (
+            <>
+              <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: false }} />
+              <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
+              <Stack.Group screenOptions={{ presentation: 'modal' }}>
+                <Stack.Screen name="Modal" component={ModalScreen} />
+              </Stack.Group>
+            </>
+        )}
+        </Stack.Navigator>
+      </UserInfoContext.Provider>
     </AuthContext.Provider>
   );
 }
@@ -103,10 +132,6 @@ function BottomTabNavigator() {
   return (
     <BottomTab.Navigator
       initialRouteName="Home"
-      // I'll decide about layout that later
-      // screenOptions={{
-      //   tabBarActiveTintColor: Colors[colorScheme].tint,
-      // }}
     >
       <BottomTab.Screen
         name="Home"
@@ -114,21 +139,6 @@ function BottomTabNavigator() {
         options={({ navigation }: RootTabScreenProps<'Home'>) => ({
           title: 'Home',
           tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />
-          // this should be removed, I just kept it here for later reference
-          // headerRight: () => (
-          //   <Pressable
-          //     onPress={() => navigation.navigate('Modal')}
-          //     style={({ pressed }) => ({
-          //       opacity: pressed ? 0.5 : 1,
-          //     })}>
-          //     <FontAwesome
-          //       name="info-circle"
-          //       size={25}
-          //       color={Colors[colorScheme].text}
-          //       style={{ marginRight: 15 }}
-          //     />
-          //   </Pressable>
-          // ),
         })}
       />
       <BottomTab.Screen
