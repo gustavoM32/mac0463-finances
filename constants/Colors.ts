@@ -1,5 +1,7 @@
 const tintColorLight = '#2f95dc';
 const tintColorDark = '#fff';
+export const earnedColor = '#03ad12'
+export const spentColor = '#de0d0d'
 
 export default {
   light: {
