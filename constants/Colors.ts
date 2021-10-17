@@ -6,7 +6,7 @@ export const spentColor = '#de0d0d'
 export default {
   light: {
     text: '#000',
-    background: '#fff',
+    background: '#d6eeff',
     tint: tintColorLight,
     tabIconDefault: '#ccc',
     tabIconSelected: tintColorLight,
