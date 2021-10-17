@@ -1,15 +1,19 @@
 import * as React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Image } from 'react-native';
+import { Subheading } from 'react-native-paper';
 
 import { Text, View } from '../components/Themed';
+import { UserInfoContext } from '../constants/Contexts';
 import { RootTabScreenProps } from '../types';
 
 export default function ProfileScreen({ navigation }: RootTabScreenProps<'Profile'>) {
+  const { userInfo } = React.useContext(UserInfoContext);
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Profile</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <Text style={styles.title}>This is the profile screen</Text>
+      <Image source={{uri: userInfo.picture}} style={styles.userImage}/>
+      <Subheading>{userInfo.name}</Subheading>
+      <Subheading>{userInfo.email}</Subheading>
     </View>
   );
 }
@@ -29,4 +33,9 @@ const styles = StyleSheet.create({
     height: 1,
     width: '80%',
   },
+  userImage: {
+    borderRadius: 200,
+    width: 150,
+    height: 150,
+  }
 });
