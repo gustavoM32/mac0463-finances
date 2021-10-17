@@ -6,6 +6,7 @@ import { Text, View } from '../components/Themed';
 import { RootTabScreenProps } from '../types';
 import { WEATHER_API_KEY } from 'react-native-dotenv';
 import { getData, setData } from '../store/Store';
+import { Title } from 'react-native-paper';
 
 const BASE_WEATHER_URL = "https://api.openweathermap.org/data/2.5/forecast?";
 
@@ -23,7 +24,13 @@ export default function WeatherScreen({ navigation }: RootTabScreenProps<'Weathe
         throw Error("Location permission denied")
       }
 
-      const location = await Location.getCurrentPositionAsync();
+      let gpsServiceStatus = await Location.hasServicesEnabledAsync();
+
+      if (!gpsServiceStatus) {
+        throw Error("No location service available");
+      }
+
+      const location = await Location.getCurrentPositionAsync({});
 
       const { latitude, longitude } = location.coords;
 
@@ -42,7 +49,6 @@ export default function WeatherScreen({ navigation }: RootTabScreenProps<'Weathe
         throw Error("Error fetching weather data")
       }
 
-      console.log(result);
     } catch (error : any) {
       setIsLoading(false);
       setErrorMessage(error.message);
@@ -99,19 +105,31 @@ export default function WeatherScreen({ navigation }: RootTabScreenProps<'Weathe
 
     const cityData = storedData[cityId];
 
+    const infoBit = (name, data) => {
+      return (
+        <View style={styles.bitsContainer}>
+          <Text>{name}</Text>
+          <Text>{data}</Text>
+        </View>
+      );
+    }
+
     let generatedViews = Object.keys(cityData).reverse().map((time) => {
       let iconUrl = `https://openweathermap.org/img/wn/${cityData[time].icon}@4x.png`;
   
       return (
-        <View key={time}>
-          <Text>{(new Date(time * 1000)).toLocaleString()}</Text>
-          <Image style={styles.icon} source={{ uri: iconUrl }}/>
-          <Text>{cityData[time].description}</Text>
-          <Text>Temperature: {cityData[time].temperature} °C</Text>
-          <Text>Precipitation: {cityData[time].precipitation}%</Text>
-          <Text>Wind speed: {cityData[time].windSpeed} km/h</Text>
-          <Text>Humidity: {cityData[time].humidity}%</Text>
-          <br></br>
+        <View key={time} style={styles.weatherInfo}>
+          <View style={{width: '25%'}}>
+            <Image style={styles.icon} source={{ uri: iconUrl }}/>
+            <Text>{cityData[time].description}</Text>
+          </View>
+          <View style={{width: '65%'}}>
+            <Text>{(new Date(time * 1000)).toLocaleString()}</Text>
+            {infoBit("Temperature", `${cityData[time].temperature} °C`)}
+            {infoBit("Precipitation", `${cityData[time].precipitation}%`)}
+            {infoBit("Wind speed", `${cityData[time].windSpeed} km/h`)}
+            {infoBit("Humidity", `${cityData[time].humidity}%`)}
+          </View>
         </View>
       );
     });
@@ -124,13 +142,15 @@ export default function WeatherScreen({ navigation }: RootTabScreenProps<'Weathe
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Weather for {weatherInfo.city.name}, {weatherInfo.city.country}</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <ScrollView>
-        {forecastViews}
-      </ScrollView>
-    </View>
+    <ScrollView>
+      <View style={styles.container}>
+        <Title>Weather for {weatherInfo.city.name}, {weatherInfo.city.country}</Title>
+        <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+        <View style={styles.mainContainer}>
+          {forecastViews}
+        </View>
+      </View>
+    </ScrollView>
   );
 }
 
@@ -140,9 +160,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  mainContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '80%'
+  },
+  weatherInfo: {
+    flex: 1,
+    width: '100%',
+    justifyContent: 'space-around',
+    flexDirection: 'row',
+    marginVertical: 18
+  },
+  bitsContainer: {
+    flex: 1,
+    width: '100%',
+    justifyContent: 'space-between',
+    flexDirection: 'row',
   },
   separator: {
     marginVertical: 30,
