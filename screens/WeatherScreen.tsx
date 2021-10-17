@@ -62,7 +62,7 @@ export default function WeatherScreen({ navigation }: RootTabScreenProps<'Weathe
   if (isLoading) {
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>Loading weather data...</Text>
+        <Text style={styles.title}>Loading forecast data...</Text>
         <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
         <Text style={styles.title}>Please wait.</Text>
       </View>
@@ -144,7 +144,7 @@ export default function WeatherScreen({ navigation }: RootTabScreenProps<'Weathe
   return (
     <ScrollView>
       <View style={styles.container}>
-        <Title>Weather for {weatherInfo.city.name}, {weatherInfo.city.country}</Title>
+        <Title>Weather forecast for {weatherInfo.city.name}, {weatherInfo.city.country}</Title>
         <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
         <View style={styles.mainContainer}>
           {forecastViews}

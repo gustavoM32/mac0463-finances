@@ -104,9 +104,9 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
   return (
     <ScrollView>
       <View style={styles.container}>
-        <Title>Olá, {name}!</Title>
+        <Title>Hello, {name}!</Title>
         <CardList />
-        <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+        <Title>Transactions</Title>
         <TransactionList></TransactionList>
       </View>
     </ScrollView>
