@@ -26,10 +26,11 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.gustavo.dmcarlos.Finances"
+      "package": "com.gustavodmcarlos.Finances"
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
-    }
+    },
+    "packagerOpts": { "config": "metro.config.js", "sourceExts": [ "js","jsx","svg","ts","tsx"] }
   }
 }
